@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_application_2/RegistrationPage.dart';
+import 'package:flutter_application_2/login.dart';
+import 'package:flutter_application_2/Splash.dart';
+import 'package:flutter_application_2/orderer.dart';
+import 'package:flutter_application_2/canteens.dart';
+import 'package:flutter_application_2/xerox.dart';
+import 'package:flutter_application_2/stationary.dart';
+import 'package:flutter_application_2/main.dart';
 
-class DelivererPage extends StatefulWidget {
+class DeliveryPage extends StatefulWidget {
   @override
-  _DelivererPageState createState() => _DelivererPageState();
+  _DeliveryPageState createState() => _DeliveryPageState();
 }
 
-class _DelivererPageState extends State<DelivererPage> with SingleTickerProviderStateMixin {
+class _DeliveryPageState extends State<DeliveryPage>
+    with SingleTickerProviderStateMixin {
   final List<Map<String, dynamic>> orders = [
     {
       'orderId': 1,
@@ -103,10 +113,7 @@ class _DelivererPageState extends State<DelivererPage> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Stud Mode'),
-        centerTitle: true,
-      ),
+      //
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
@@ -178,7 +185,8 @@ class _DelivererPageState extends State<DelivererPage> with SingleTickerProvider
                           return OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(
-                                color: orders[index]['status'] == 'Accept Request'
+                                color: orders[index]['status'] ==
+                                        'Accept Request'
                                     ? _animation.value > 0.5
                                         ? Colors.red
                                         : Colors.red.withOpacity(0.5)

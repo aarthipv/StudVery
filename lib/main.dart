@@ -14,9 +14,9 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'dart:html';
 import 'dart:js' as js;
-import 'firebase_options.dart';
 import 'dart:js_util' as js_util;
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart'; // Import the Firebase options
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,8 +26,7 @@ void main() async {
   runApp(MyApp());
 }
 
-
- final cartState = CartState();
+final cartState = CartState();
 
 class CartItem {
   final String name;
@@ -63,7 +62,6 @@ class CartState {
     items.clear();
   }
 }
-// Global instance
 
 class MyApp extends StatelessWidget {
   @override
@@ -77,44 +75,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-class MainAppPage extends StatefulWidget {
-  @override
-  _MainAppPageState createState() => _MainAppPageState();
-}
-
-class _MainAppPageState extends State<MainAppPage> {
-  bool isOrderer = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset(
-            'assets/logo.jpg', // Replace with your logo path
-            width: 200, // Adjust the width as needed
-            height: 200, // Adjust the height as needed
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Switch(
-            value: isOrderer,
-            onChanged: (value) {
-              setState(() {
-                isOrderer = value;
-              });
-            },
-          ),
-        ],
-      ),
-      body: isOrderer ? OrdererPage() : DelivererPage(),
-    );
-  }
-}
-
 class MyHomePage extends StatelessWidget {
   final TextEditingController classNumberController = TextEditingController();
 
@@ -124,13 +84,8 @@ class MyHomePage extends StatelessWidget {
       'amount': cartState.total * 100,
       'name': 'StudVery',
       'description': 'Payment for your cart',
-      'prefill': {
-        'contact': '1234567890',
-        'email': 'test@example.com'
-      },
-      'theme': {
-        'color': '#F37254'
-      }
+      'prefill': {'contact': '1234567890', 'email': 'test@example.com'},
+      'theme': {'color': '#F37254'}
     });
     try {
       js.context.callMethod('openRazorpayPayment', [
@@ -148,6 +103,7 @@ class MyHomePage extends StatelessWidget {
       debugPrint(e.toString());
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,6 +136,78 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+class MainAppPage extends StatefulWidget {
+  @override
+  _MainAppPageState createState() => _MainAppPageState();
+}
+
+class _MainAppPageState extends State<MainAppPage> {
+  bool isOrderer = false; // For Orderer/Stud toggle
+  bool isDarkTheme = false; // For Light/Dark theme toggle
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+      theme: ThemeData.light().copyWith(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.purple, // Purple AppBar for light theme
+          foregroundColor: Colors.white, // White text and icons
+        ),
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.purple, // Purple AppBar for dark theme
+          foregroundColor: Colors.white, // White text and icons
+        ),
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  isOrderer ? 'Stud Mode' : 'Orderer Mode',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(width: 10),
+                Switch(
+                  value: isOrderer,
+                  onChanged: (value) {
+                    setState(() {
+                      isOrderer = value;
+                    });
+                  },
+                  activeColor: Colors.white,
+                  activeTrackColor: Color.fromARGB(255, 147, 38, 38),
+                  inactiveThumbColor: Colors.white,
+                  inactiveTrackColor: Colors.grey,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            // Light/Dark Theme Toggle
+            IconButton(
+              icon: Icon(
+                isDarkTheme ? Icons.nights_stay : Icons.wb_sunny,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                setState(() {
+                  isDarkTheme = !isDarkTheme;
+                });
+              },
+            ),
+          ],
+        ),
+        body: isOrderer ? DeliveryPage() : OrdererPage(),
+      ),
+    );
+  }
+}
 
 class CartPage extends StatefulWidget {
   @override
@@ -215,9 +243,9 @@ class _CartPageState extends State<CartPage>
     setState(() {
       showDeliveryLocation = !showDeliveryLocation;
       if (showDeliveryLocation) {
-        _controller.forward();
-      } else {
         _controller.reverse();
+      } else {
+        _controller.forward();
       }
     });
   }
@@ -325,14 +353,17 @@ class _CartPageState extends State<CartPage>
                         ),
                         SizedBox(height: 10),
                         ElevatedButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RazorpayPaymentPage(cartState: cartState,)),
-    );
-  },
-  child: Text('Proceed to Payment'),
-),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RazorpayPaymentPage(
+                                        cartState: cartState,
+                                      )),
+                            );
+                          },
+                          child: Text('Proceed to Payment'),
+                        ),
                       ],
                     ),
                   ),
