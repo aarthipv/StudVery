@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_2/main.dart'; // Import MyHomePage
 import 'theme_notifier.dart'; // Import the ThemeNotifier
+import 'common_app_bar.dart'; // Import the CommonAppBar
 
 class DeliveryPage extends StatefulWidget {
   @override
@@ -88,61 +89,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()),
-                );
-              },
-              child: Text(
-                'Orderer',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            SizedBox(width: 10),
-            Text('|', style: TextStyle(color: Colors.grey)),
-            SizedBox(width: 10),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => DeliveryPage()),
-                );
-              },
-              child: Text(
-                'Deliverer',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-            ),
-          ],
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Provider.of<ThemeNotifier>(context).isDarkTheme
-                  ? Icons.dark_mode
-                  : Icons.light_mode,
-            ),
-            onPressed: () {
-              Provider.of<ThemeNotifier>(context, listen: false).toggleTheme();
-            },
-          ),
-        ],
-      ),
+      appBar: CommonAppBar(isOrdererMode: false),
       body: ListView.builder(
         itemCount: orders.length,
         itemBuilder: (context, index) {

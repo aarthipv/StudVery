@@ -50,50 +50,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final bool isOrdererMode;
-  final Function(bool) onModeToggle;
-
-  const GlobalAppBar({
-    required this.isOrdererMode,
-    required this.onModeToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            isOrdererMode ? 'Orderer Mode' : 'Deliverer Mode',
-            style: TextStyle(fontSize: 18),
-          ),
-          Switch(
-            value: isOrdererMode,
-            onChanged: onModeToggle,
-            activeColor: Colors.purple,
-          ),
-        ],
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(
-            Provider.of<ThemeNotifier>(context).isDarkTheme
-                ? Icons.dark_mode
-                : Icons.light_mode,
-          ),
-          onPressed: () {
-            Provider.of<ThemeNotifier>(context, listen: false).toggleTheme();
-          },
-        ),
-      ],
-    );
-  }
-
-  @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
-}
 
 
 class MyHomePage extends StatefulWidget {
@@ -112,13 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: GlobalAppBar(
-        isOrdererMode: isOrdererMode,
-        onModeToggle: toggleMode,
-      ),
-      body: isOrdererMode ? OrdererPage() : DeliveryPage(),
-    );
+    return isOrdererMode ? OrdererPage() : DeliveryPage();
   }
 }
 
