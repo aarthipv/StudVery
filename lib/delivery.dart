@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_application_2/RegistrationPage.dart';
-import 'package:flutter_application_2/login.dart';
-import 'package:flutter_application_2/Splash.dart';
-import 'package:flutter_application_2/orderer.dart';
-import 'package:flutter_application_2/canteens.dart';
-import 'package:flutter_application_2/xerox.dart';
-import 'package:flutter_application_2/stationary.dart';
-import 'package:flutter_application_2/main.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_application_2/main.dart'; // Import MyHomePage
+import 'theme_notifier.dart'; // Import the ThemeNotifier
 
 class DeliveryPage extends StatefulWidget {
   @override
   _DeliveryPageState createState() => _DeliveryPageState();
 }
 
-class _DeliveryPageState extends State<DeliveryPage>
-    with SingleTickerProviderStateMixin {
+class _DeliveryPageState extends State<DeliveryPage> {
   final List<Map<String, dynamic>> orders = [
     {
       'orderId': 1,
@@ -67,26 +60,6 @@ class _DeliveryPageState extends State<DeliveryPage>
     },
   ];
 
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _animation = Tween<double>(begin: 1.0, end: 0.3).animate(_controller);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   void updateStatus(int index) {
     setState(() {
       if (orders[index]['status'] == 'Accept Request') {
@@ -97,120 +70,131 @@ class _DeliveryPageState extends State<DeliveryPage>
     });
   }
 
+  String getStatus(int index) {
+    return orders[index]['status'];
+  }
+
   Color getStatusColor(String status) {
     switch (status) {
-      case 'Accept Request':
-        return const Color.fromARGB(255, 202, 25, 12);
       case 'Ongoing':
         return Colors.orange;
       case 'Completed':
         return Colors.green;
       default:
-        return Colors.grey;
+        return Colors.blue;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: orders.length,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 4,
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Destination: ${orders[index]['destination']}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: Colors.blueAccent,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Total Price: ₹${orders[index]['totalPrice']}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    ...orders[index]['items'].map<Widget>((item) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: Text(
-                          '${item['name']} x ${item['quantity']} from ${item['source']}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                    SizedBox(height: 8),
-                    Divider(),
-                    ListTile(
-                      leading: Icon(
-                        orders[index]['status'] == 'Completed'
-                            ? Icons.check_circle
-                            : Icons.pending,
-                        color: getStatusColor(orders[index]['status']),
-                      ),
-                      title: Text(
-                        'User: ${orders[index]['user']}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      subtitle: Text(
-                        'Phone: ${orders[index]['phone']}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      trailing: AnimatedBuilder(
-                        animation: _animation,
-                        builder: (context, child) {
-                          return OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: orders[index]['status'] ==
-                                        'Accept Request'
-                                    ? _animation.value > 0.5
-                                        ? Colors.red
-                                        : Colors.red.withOpacity(0.5)
-                                    : getStatusColor(orders[index]['status']),
-                                width: 2.0, // Increase the border thickness
-                              ),
-                            ),
-                            onPressed: () => updateStatus(index),
-                            child: Text(
-                              orders[index]['status'],
-                              style: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyHomePage()),
+                );
+              },
+              child: Text(
+                'Orderer',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey,
                 ),
               ),
-            );
-          },
+            ),
+            SizedBox(width: 10),
+            Text('|', style: TextStyle(color: Colors.grey)),
+            SizedBox(width: 10),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => DeliveryPage()),
+                );
+              },
+              child: Text(
+                'Deliverer',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+          ],
         ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Provider.of<ThemeNotifier>(context).isDarkTheme
+                  ? Icons.dark_mode
+                  : Icons.light_mode,
+            ),
+            onPressed: () {
+              Provider.of<ThemeNotifier>(context, listen: false).toggleTheme();
+            },
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: orders.length,
+        itemBuilder: (context, index) {
+          final order = orders[index];
+          return Card(
+            margin: EdgeInsets.all(10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Order ID: ${order['orderId']}'),
+                  Text('Destination: ${order['destination']}'),
+                  Text('Total Price: ₹${order['totalPrice']}'),
+                  Text('User: ${order['user']}'),
+                  Text('Phone: ${order['phone']}'),
+                  Row(
+                    children: [
+                      Text('Status: '),
+                      Text(
+                        getStatus(index),
+                        style: TextStyle(
+                          color: getStatusColor(getStatus(index)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Text('Items:'),
+                  ...order['items'].map<Widget>((item) {
+                    return Text(
+                        '${item['quantity']} x ${item['name']} from ${item['source']}');
+                  }).toList(),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      updateStatus(index);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: getStatusColor(getStatus(index)),
+                    ),
+                    child: Text(getStatus(index)),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

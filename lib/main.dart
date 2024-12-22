@@ -1,30 +1,128 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_application_2/RegistrationPage.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_application_2/login.dart';
 import 'package:flutter_application_2/Splash.dart';
 import 'package:flutter_application_2/orderer.dart';
-import 'package:flutter_application_2/canteens.dart';
-import 'package:flutter_application_2/xerox.dart';
-import 'package:flutter_application_2/delivery.dart';
-import 'package:flutter_application_2/stationary.dart';
-import 'package:flutter_application_2/RazorpaymentPage.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:flutter/services.dart';
-import 'dart:convert';
-import 'dart:html';
-import 'dart:js' as js;
-import 'dart:js_util' as js_util;
+import 'theme_notifier.dart';
+import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // Import the Firebase options
+import 'RazorpaymentPage.dart';
+import 'delivery.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // Use the Firebase options
+    options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeNotifier(),
+      child: MyApp(),
+    ),
+  );
 }
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ThemeNotifier>(
+      builder: (context, themeNotifier, child) {
+        return MaterialApp(
+          title: 'StudVery',
+          theme: ThemeData.light().copyWith(
+            primaryColor: Colors.purple
+          ),
+          darkTheme: ThemeData.dark().copyWith(
+            primaryColor: Colors.purple
+          ),
+          themeMode: themeNotifier.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+          debugShowCheckedModeBanner: false,
+          home: SplashScreen(
+            onSplashComplete: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage()),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final bool isOrdererMode;
+  final Function(bool) onModeToggle;
+
+  const GlobalAppBar({
+    required this.isOrdererMode,
+    required this.onModeToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            isOrdererMode ? 'Orderer Mode' : 'Deliverer Mode',
+            style: TextStyle(fontSize: 18),
+          ),
+          Switch(
+            value: isOrdererMode,
+            onChanged: onModeToggle,
+            activeColor: Colors.purple,
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(
+            Provider.of<ThemeNotifier>(context).isDarkTheme
+                ? Icons.dark_mode
+                : Icons.light_mode,
+          ),
+          onPressed: () {
+            Provider.of<ThemeNotifier>(context, listen: false).toggleTheme();
+          },
+        ),
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  bool isOrdererMode = true;
+
+  void toggleMode(bool isOrderer) {
+    setState(() {
+      isOrdererMode = isOrderer;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: GlobalAppBar(
+        isOrdererMode: isOrdererMode,
+        onModeToggle: toggleMode,
+      ),
+      body: isOrdererMode ? OrdererPage() : DeliveryPage(),
+    );
+  }
+}
+
+
 
 final cartState = CartState();
 
@@ -60,168 +158,6 @@ class CartState {
 
   void clearCart() {
     items.clear();
-  }
-}
-
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool isDarkTheme = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'StudVery',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(
-        onSplashComplete: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  final TextEditingController classNumberController = TextEditingController();
-
-  void openCheckout() {
-    var options = js_util.jsify({
-      'key': 'rzp_test_ry9cS8x8J3XYbD',
-      'amount': cartState.total * 100,
-      'name': 'StudVery',
-      'description': 'Payment for your cart',
-      'prefill': {'contact': '1234567890', 'email': 'test@example.com'},
-      'theme': {'color': '#F37254'}
-    });
-    try {
-      js.context.callMethod('openRazorpayPayment', [
-        options,
-        js.allowInterop((response) {
-          // Handle success
-          print('Payment successful: $response');
-        }),
-        js.allowInterop((response) {
-          // Handle failure
-          print('Payment failed: $response');
-        })
-      ]);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('My Home Page'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            TextField(
-              controller: classNumberController,
-              decoration: InputDecoration(
-                labelText: 'Class Number',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: openCheckout,
-              child: Text('Proceed to Payment'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class MainAppPage extends StatefulWidget {
-  @override
-  _MainAppPageState createState() => _MainAppPageState();
-}
-
-class _MainAppPageState extends State<MainAppPage> {
-  bool isOrderer = false; // For Orderer/Stud toggle
-  bool isDarkTheme = false; // For Light/Dark theme toggle
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-      theme: ThemeData.light().copyWith(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.purple, // Purple AppBar for light theme
-          foregroundColor: Colors.white, // White text and icons
-        ),
-      ),
-      darkTheme: ThemeData.dark().copyWith(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.purple, // Purple AppBar for dark theme
-          foregroundColor: Colors.white, // White text and icons
-        ),
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  isOrderer ? 'Stud Mode' : 'Orderer Mode',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(width: 10),
-                Switch(
-                  value: isOrderer,
-                  onChanged: (value) {
-                    setState(() {
-                      isOrderer = value;
-                    });
-                  },
-                  activeColor: Colors.white,
-                  activeTrackColor: Color.fromARGB(255, 147, 38, 38),
-                  inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: Colors.grey,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            // Light/Dark Theme Toggle
-            IconButton(
-              icon: Icon(
-                isDarkTheme ? Icons.nights_stay : Icons.wb_sunny,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                setState(() {
-                  isDarkTheme = !isDarkTheme;
-                });
-              },
-            ),
-          ],
-        ),
-        body: isOrderer ? DeliveryPage() : OrdererPage(),
-      ),
-    );
   }
 }
 
@@ -389,5 +325,3 @@ class _CartPageState extends State<CartPage>
     );
   }
 }
-
-// Separate pages for each entity
