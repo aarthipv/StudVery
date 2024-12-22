@@ -63,14 +63,30 @@ class CartState {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isDarkTheme = false;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'StudVery',
-      theme: ThemeData(primarySwatch: Colors.purple),
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: SplashScreen(
+        onSplashComplete: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+        },
+      ),
     );
   }
 }

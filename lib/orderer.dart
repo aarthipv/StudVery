@@ -8,8 +8,7 @@ import 'package:flutter_application_2/canteens.dart';
 import 'package:flutter_application_2/xerox.dart';
 import 'package:flutter_application_2/delivery.dart';
 import 'package:flutter_application_2/stationary.dart';
-import 'package:carousel_slider/carousel_slider.dart' as carousel_slider;
-import 'package:carousel_slider/carousel_options.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_application_2/pickuppage.dart';
 import 'package:flutter_application_2/orderproblem.dart';
 
@@ -78,7 +77,7 @@ class _OrdererPageState extends State<OrdererPage> {
       'page': StationaryPage(),
     },
     {
-      'image': 'assets/photocopy.jpg',
+      'image': 'assets/photocopy.png',
       'tagline': 'Quick photocopy services available!',
       'page': XeroxPage(),
     },
@@ -90,7 +89,7 @@ class _OrdererPageState extends State<OrdererPage> {
   ];
 
   int _currentIndex = 0;
-  final carousel_slider.CarouselController _controller = carousel_slider.CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +168,7 @@ class _OrdererPageState extends State<OrdererPage> {
               ),
               child: Stack(
                 children: [
-                  carousel_slider.CarouselSlider(
+                  CarouselSlider(
                     items: carouselItems.map((item) {
                       return Builder(
                         builder: (BuildContext context) {

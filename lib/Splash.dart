@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_2/login.dart';
 
 class SplashScreen extends StatefulWidget {
+  final VoidCallback onSplashComplete;
+
+  SplashScreen({required this.onSplashComplete});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
