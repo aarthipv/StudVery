@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_2/login.dart';
 
 class SplashScreen extends StatefulWidget {
-  final VoidCallback onSplashComplete;
-
-  SplashScreen({required this.onSplashComplete});
-
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -24,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
     _controller.forward();
 
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 8), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginPage()),
@@ -50,32 +47,32 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           ),
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ScaleTransition(
-                scale: _animation,
-                child: Text(
-                  "StudVery",
+          child: ScaleTransition(
+            scale: _animation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ClipOval(
+                  child: Image.asset(
+                    'assets/logo.jpg', // Replace with your image path
+                    width: 200, // Adjust the size as needed
+                    height: 200, // Adjust the size as needed
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                
+                SizedBox(height: 10),
+                Text(
+                  "For the students, By the students",
                   style: TextStyle(
-                    fontSize: 50,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w300,
+                    color: Colors.white70,
                     fontFamily: 'Cinzel', // Elegant font applied
                   ),
                 ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                "For the students, By the students",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300,
-                  color: Colors.white70,
-                  fontFamily: 'Cinzel', // Elegant font applied
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

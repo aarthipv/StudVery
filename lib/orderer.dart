@@ -80,7 +80,7 @@ class _OrdererPageState extends State<OrdererPage> {
       'page': StationaryPage(),
     },
     {
-      'image': 'assets/photocopy.jpg',
+      'image': 'assets/photocopy.png',
       'tagline': 'Quick photocopy services available!',
       'page': XeroxPage(),
     },

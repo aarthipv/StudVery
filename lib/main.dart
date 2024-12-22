@@ -37,14 +37,7 @@ class MyApp extends StatelessWidget {
           ),
           themeMode: themeNotifier.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
           debugShowCheckedModeBanner: false,
-          home: SplashScreen(
-            onSplashComplete: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MyHomePage()),
-              );
-            },
-          ),
+          home: SplashScreen(),
         );
       },
     );
